@@ -15,3 +15,4 @@ My config files for:
 
 ### Neovim
 - [vim](https://www.vim.org/download.php)
+- [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim)
