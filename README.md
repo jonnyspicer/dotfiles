@@ -8,6 +8,7 @@ My config files for:
 ### Oh My ZSH
 - [Dracula theme](https://draculatheme.com/zsh)
 - [zsh](https://github.com/ohmyzsh/ohmyzsh/wiki/Installing-ZSH)
+- [zoxide](https://github.com/ajeetdsouza/zoxide) - optional, but the current config will try to initiate zoxide when the shell starts 
 
 ### tmux
 - [libevent](https://github.com/libevent/libevent/releases/tag/release-2.1.12-stable)
