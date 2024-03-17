@@ -4,6 +4,8 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+vim.wo.relativenumber = true
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -19,6 +21,11 @@ if not vim.loop.fs_stat(lazypath) then
   }
 end
 vim.opt.rtp:prepend(lazypath)
+
+vim.lsp.set_log_level 'debug'
+if vim.fn.has 'nvim-0.5.1' == 1 then
+  require('vim.lsp.log').set_format_func(vim.inspect)
+end
 
 -- [[ Configure plugins ]]
 -- NOTE: Here is where you install your plugins.
@@ -148,24 +155,30 @@ require('lazy').setup({
 
         -- Text object
         map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'select git hunk' })
+
+        -- Telescope
+        local builtin = require('telescope.builtin')
+        map('n', '<leader>ff', builtin.find_files, {})
+        map('n', '<leader>fg', builtin.live_grep, {})
+        map('n', '<leader>fb', builtin.buffers, {})
+        map('n', '<leader>fh', builtin.help_tags, {})
       end,
     },
-   
+
     -- NB: plugins above came with kickstart. Plugins below are added separately.
     {
       "christoomey/vim-tmux-navigator",
-      lazy=false,
+      lazy = false,
+    },
+    {
+      "mfussenegger/nvim-dap",
+      "jose-elias-alvarez/null-ls.nvim",
+      "MunifTanjim/prettier.nvim",
+      "windwp/nvim-autopairs", -- TODO: try and get this working
+      "mfussenegger/nvim-jdtls",
     },
   },
 
-  {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
-  },
   {
     -- Dracula theme
     'Mofiqul/dracula.nvim',
@@ -182,7 +195,7 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = false,
-        theme = 'onedark',
+        theme = 'dracula',
         component_separators = '|',
         section_separators = '',
       },
@@ -197,9 +210,6 @@ require('lazy').setup({
     main = 'ibl',
     opts = {},
   },
-
-  -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -222,33 +232,50 @@ require('lazy').setup({
     },
   },
 
+  { -- Autoformat
+    'stevearc/conform.nvim',
+    opts = {
+      notify_on_error = false,
+      format_on_save = function(bufnr)
+        -- Disable "format_on_save lsp_fallback" for languages that don't
+        -- have a well standardized coding style. You can add additional
+        -- languages here or re-enable it for the disabled ones.
+        local disable_filetypes = { c = true, cpp = true }
+        return {
+          timeout_ms = 500,
+          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+        }
+      end,
+      formatters_by_ft = {
+        lua = { 'stylua' },
+        -- Conform can also run multiple formatters sequentially
+        -- python = { "isort", "black" },
+        --
+        -- You can use a sub-list to tell conform to run *until* a formatter
+        -- is found.
+        -- javascript = { { "prettierd", "prettier" } },
+      },
+    },
+  },
+
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
+    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects',
     },
     build = ':TSUpdate',
   },
 
-  -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
-  --       These are some example plugins that I've included in the kickstart repository.
-  --       Uncomment any of the lines below to enable them.
-  -- require 'kickstart.plugins.autoformat',
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.debug',
 
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
-  --    up-to-date with whatever is in the kickstart repo.
-  --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  --
-  --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  -- { import = 'custom.plugins' },
 }, {})
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
+
+vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 
 -- Set highlight on search
 vim.o.hlsearch = false
@@ -256,8 +283,8 @@ vim.o.hlsearch = false
 -- Make line numbers default
 vim.wo.number = true
 
--- Enable mouse mode
-vim.o.mouse = 'a'
+-- Enable mouse mode - disabled for now to force me to learn to use hjkl properly
+vim.o.mouse = ''
 
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
@@ -304,10 +331,10 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open float
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 -- Keymaps to navigate Tmux windows
-vim.keymap.set('n', "<C-h>", "<cmd> TmuxNavigateLeft<CR>", { silent = true} )
-vim.keymap.set('n', "<C-l>", "<cmd> TmuxNavigateRight<CR>", { silent = true} )
-vim.keymap.set('n', "<C-j>", "<cmd> TmuxNavigateDown<CR>", { silent = true} )
-vim.keymap.set('n', "<C-k>", "<cmd> TmuxNavigateUp<CR>", { silent = true} )
+vim.keymap.set('n', "<C-h>", "<cmd> TmuxNavigateLeft<CR>", { silent = true })
+vim.keymap.set('n', "<C-l>", "<cmd> TmuxNavigateRight<CR>", { silent = true })
+vim.keymap.set('n', "<C-j>", "<cmd> TmuxNavigateDown<CR>", { silent = true })
+vim.keymap.set('n', "<C-k>", "<cmd> TmuxNavigateUp<CR>", { silent = true })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -406,10 +433,10 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
+    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'java', 'typescript', 'vimdoc', 'vim', 'bash' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
-    auto_install = false,
+    auto_install = true,
 
     highlight = { enable = true },
     indent = { enable = true },
@@ -546,12 +573,12 @@ require('mason-lspconfig').setup()
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
 local servers = {
-  -- clangd = {},
+  clangd = {},
   -- gopls = {},
-  -- pyright = {},
-  -- rust_analyzer = {},
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
+  pyright = {},
+  rust_analyzer = {},
+  tsserver = {},
+  html = { filetypes = { 'html', 'twig', 'hbs' } },
 
   lua_ls = {
     Lua = {
@@ -563,7 +590,13 @@ local servers = {
   },
 }
 
--- Setup neovim lua configuration
+-- typescript-language-server setup
+require 'lspconfig'.clangd.setup {}
+require 'lspconfig'.gopls.setup {}
+require 'lspconfig'.pyright.setup {}
+require 'lspconfig'.rust_analyzer.setup {}
+require 'lspconfig'.tsserver.setup {}
+require 'lspconfig'.html.setup {}
 require('neodev').setup()
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
