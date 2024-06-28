@@ -171,6 +171,13 @@ require('lazy').setup({
       lazy = false,
     },
     {
+      "preservim/vim-wordy",
+      "dpelle/vim-LanguageTool",
+    },
+    -- {
+    --   "mfussenegger/nvim-jdtls",
+    -- },
+    {
       "mfussenegger/nvim-dap",
       "jose-elias-alvarez/null-ls.nvim",
       "MunifTanjim/prettier.nvim",
@@ -573,7 +580,7 @@ require('mason-lspconfig').setup()
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
 local servers = {
-  clangd = {},
+  -- clangd = {},
   -- gopls = {},
   pyright = {},
   rust_analyzer = {},
