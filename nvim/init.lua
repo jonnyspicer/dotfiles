@@ -47,7 +47,7 @@ require('lazy').setup({
   'tpope/vim-commentary',
 
   -- NOTE: This is where your plugins related to LSP can be installed.
-  --  The configuration is done below. Search for lspconfig to find it below.
+  --  The configuration is done below. Search for lspconfig to find it below. 
   {
     -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
@@ -157,7 +157,7 @@ require('lazy').setup({
         map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'select git hunk' })
 
         -- Telescope
-        local builtin = require('telescope.builtin')
+        local builtin = require 'telescope.builtin'
         map('n', '<leader>ff', builtin.find_files, {})
         map('n', '<leader>fg', builtin.live_grep, {})
         map('n', '<leader>fb', builtin.buffers, {})
@@ -167,22 +167,23 @@ require('lazy').setup({
 
     -- NB: plugins above came with kickstart. Plugins below are added separately.
     {
-      "christoomey/vim-tmux-navigator",
+      'christoomey/vim-tmux-navigator',
       lazy = false,
     },
     {
-      "preservim/vim-wordy",
-      "dpelle/vim-LanguageTool",
+      'preservim/vim-wordy',
+      'dpelle/vim-LanguageTool',
     },
     -- {
     --   "mfussenegger/nvim-jdtls",
     -- },
     {
-      "mfussenegger/nvim-dap",
-      "jose-elias-alvarez/null-ls.nvim",
-      "MunifTanjim/prettier.nvim",
-      "windwp/nvim-autopairs", -- TODO: try and get this working
-      "mfussenegger/nvim-jdtls",
+      'mfussenegger/nvim-dap',
+      'jose-elias-alvarez/null-ls.nvim',
+      'MunifTanjim/prettier.nvim',
+      'windwp/nvim-autopairs', -- TODO: try and get this working
+      'mfussenegger/nvim-jdtls',
+      'github/copilot.vim',
     },
   },
 
@@ -268,14 +269,12 @@ require('lazy').setup({
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects',
-    },
+    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
     build = ':TSUpdate',
   },
 
   require 'kickstart.plugins.indent_line',
   require 'kickstart.plugins.debug',
-
 }, {})
 
 -- [[ Setting options ]]
@@ -338,10 +337,10 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open float
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 -- Keymaps to navigate Tmux windows
-vim.keymap.set('n', "<C-h>", "<cmd> TmuxNavigateLeft<CR>", { silent = true })
-vim.keymap.set('n', "<C-l>", "<cmd> TmuxNavigateRight<CR>", { silent = true })
-vim.keymap.set('n', "<C-j>", "<cmd> TmuxNavigateDown<CR>", { silent = true })
-vim.keymap.set('n', "<C-k>", "<cmd> TmuxNavigateUp<CR>", { silent = true })
+vim.keymap.set('n', '<C-h>', '<cmd> TmuxNavigateLeft<CR>', { silent = true })
+vim.keymap.set('n', '<C-l>', '<cmd> TmuxNavigateRight<CR>', { silent = true })
+vim.keymap.set('n', '<C-j>', '<cmd> TmuxNavigateDown<CR>', { silent = true })
+vim.keymap.set('n', '<C-k>', '<cmd> TmuxNavigateUp<CR>', { silent = true })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -362,6 +361,14 @@ require('telescope').setup {
       i = {
         ['<C-u>'] = false,
         ['<C-d>'] = false,
+      },
+    },
+    pickers = {
+      find_files = {
+        hidden = true,
+      },
+      live_grep = {
+        hidden = true,
       },
     },
   },
@@ -581,9 +588,9 @@ require('mason-lspconfig').setup()
 --  define the property 'filetypes' to the map in question.
 local servers = {
   -- clangd = {},
-  -- gopls = {},
+  gopls = {},
   pyright = {},
-  rust_analyzer = {},
+  -- rust_analyzer = {},
   tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
 
@@ -598,12 +605,12 @@ local servers = {
 }
 
 -- typescript-language-server setup
-require 'lspconfig'.clangd.setup {}
-require 'lspconfig'.gopls.setup {}
-require 'lspconfig'.pyright.setup {}
-require 'lspconfig'.rust_analyzer.setup {}
-require 'lspconfig'.tsserver.setup {}
-require 'lspconfig'.html.setup {}
+require('lspconfig').clangd.setup {}
+require('lspconfig').gopls.setup {}
+require('lspconfig').pyright.setup {}
+require('lspconfig').rust_analyzer.setup {}
+require('lspconfig').tsserver.setup {}
+require('lspconfig').html.setup {}
 require('neodev').setup()
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
